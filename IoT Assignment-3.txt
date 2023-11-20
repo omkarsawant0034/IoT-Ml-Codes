@@ -1,0 +1,53 @@
+#define BLYNK_TEMPLATE_ID "TMPL3kE2BsD4_"
+#define BLYNK_TEMPLATE_NAME "A3"
+#define BLYNK_AUTH_TOKEN "QBw9NY_HDDPeOLUdd85oVGRvg1I8dD5i"
+
+#define WIFISSID "Omkar"
+#define PASSWORD "1234567890"
+#define BLYNK_PRINT Serial
+#include <BlynkSimpleEsp8266.h>
+// Declaring a global variabl for sensor data
+int moisture_percentage;
+// This function creates the timer object. It's part of Blynk library
+BlynkTimer timer;
+void myTimer()
+{
+ // This function describes what will happen with each timer tick
+ // e.g. writing sensor value to datastream V0
+ Blynk.virtualWrite(V0, moisture_percentage);
+}
+void setup()
+{
+ Serial.begin(115200);
+ //Connecting to Blynk Cloud
+ Blynk.begin(BLYNK_AUTH_TOKEN, WIFISSID, PASSWORD);
+ // Setting interval to send data to Blynk Cloud to 1000ms.
+ // It means that data will be sent every second
+ timer.setInterval(1000L, myTimer);
+}
+void loop()
+{
+ // Runs all Blynk stuff
+ Blynk.run();
+ // runs BlynkTimer
+ timer.run();
+
+ // Reading sensor from hardware analog pin A0
+ moisture_percentage = ( 100 - ((analogRead(A0)/1023.00) * 100));
+ Serial.print("Moisture Percentage = ");
+ Serial.print(moisture_percentage);
+ Serial.print("%\n");
+ delay(1000);
+ if ( moisture_percentage > 30)
+ {
+// digitalWrite(D1, HIGH); //D0
+ Serial.println("does not need water");
+ delay(1000);
+ }
+ else
+ {
+// digitalWrite(D1, LOW); //D0
+ Serial.println("needs water");
+ delay(1000); 
+    }
+ }

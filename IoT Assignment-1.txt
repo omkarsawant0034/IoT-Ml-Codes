@@ -1,0 +1,54 @@
+#include <LiquidCrystal.h>
+#include <Servo.h>
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+Servo myservo;
+const int trigPin = 6;
+const int echoPin = 7;
+
+void setup() {
+  Serial.begin(9600);
+  myservo.attach(9);
+  pinMode(13, OUTPUT); // Move this line to the setup function
+  pinMode(trigPin, OUTPUT);
+}
+
+void loop() {
+  long duration, cm;
+  
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(20);
+  digitalWrite(trigPin, LOW);
+  
+  pinMode(echoPin, INPUT);
+  duration = pulseIn(echoPin, HIGH);
+  cm = microsecondsToCentimeters(duration);
+  
+  if (cm > 100 && cm < 150) {
+    digitalWrite(13, HIGH);
+    myservo.write(90);
+    delay(10);
+  } else {
+    digitalWrite(13, LOW);
+    myservo.write(0);
+    delay(10);
+  }
+
+  Serial.print(cm);
+  Serial.print("cm");
+  Serial.println();
+  
+  lcd.setCursor(0, 1);
+  lcd.print("Dist: ");
+  lcd.print(cm);
+  lcd.print(" cm");
+  
+  delay(50);
+}
+
+long microsecondsToCentimeters(long microseconds) {
+  // The speed of sound is 340 m/s or 29 microseconds per centimeter
+  return microseconds / 29 / 2;
+}
